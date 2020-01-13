@@ -2,7 +2,7 @@
 #    but changed as described at https://docs.microsoft.com/en-us/virtualization/windowscontainers/kubernetes/network-topologies
 #    to be compatible with windows and to only include the amd64 DaemonSet.
 ---
-apiVersion: extensions/v1beta1
+apiVersion: policy/v1beta1
 kind: PodSecurityPolicy
 metadata:
   name: psp.flannel.unprivileged
@@ -135,7 +135,7 @@ data:
       }
     }
 ---
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: kube-flannel-ds-amd64
@@ -144,6 +144,10 @@ metadata:
     tier: node
     app: flannel
 spec:
+  selector:
+    matchLabels:
+      tier: node
+      app: flannel
   template:
     metadata:
       labels:
