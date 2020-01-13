@@ -5,8 +5,8 @@ ENV['VAGRANT_NO_PARALLEL'] = 'yes'
 require 'ipaddr'
 
 number_of_master_nodes          = 1
-number_of_ubuntu_worker_nodes   = 2
-number_of_windows_worker_nodes  = 2
+number_of_ubuntu_worker_nodes   = 1
+number_of_windows_worker_nodes  = 1
 first_master_node_ip            = '10.11.0.101'
 first_ubuntu_worker_node_ip     = '10.11.0.201'
 first_windows_worker_node_ip    = '10.11.0.221'
@@ -19,7 +19,7 @@ ubuntu_worker_node_ip_addr      = IPAddr.new first_ubuntu_worker_node_ip
 windows_worker_node_ip_addr     = IPAddr.new first_windows_worker_node_ip
 
 Vagrant.configure(2) do |config|
-  config.vm.box = 'ubuntu-18.04-amd64'
+  config.vm.box = 'ubuntu/xenial64'
 
   config.vm.provider 'libvirt' do |lv, config|
     lv.cpus = 4
@@ -82,7 +82,7 @@ Vagrant.configure(2) do |config|
     ip = windows_worker_node_ip_addr.to_s; windows_worker_node_ip_addr = windows_worker_node_ip_addr.succ
 
     config.vm.define name do |config|
-      config.vm.box = 'windows-2019-amd64'
+      config.vm.box = 'StefanScherer/windows_2019_docker'
       config.vm.provider 'libvirt' do |lv, config|
         lv.memory = 2*1024
         # replace the default synced_folder with something that works in the base box.
