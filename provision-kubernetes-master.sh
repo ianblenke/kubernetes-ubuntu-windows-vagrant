@@ -46,15 +46,23 @@ kubectl \
 
 # wait for this node to be Ready.
 # e.g. km1     Ready     master    35m       v1.14.0
-$SHELL -c 'node_name=$(hostname); while [ -z "$(kubectl get nodes $node_name | grep -E "$node_name\s+Ready\s+")" ]; do sleep 3; done'
+$SHELL -c 'node_name=$(hostname); while [ -z "$(kubectl get nodes $node_name | grep -E "$node_name\s+Ready\s+")" ]; do kubectl get nodes ; sleep 3; done'
 
 # wait for the kube-dns pod to be Running.
 # e.g. coredns-fb8b8dccf-rh4fg   1/1     Running   0          33m
-$SHELL -c 'while [ -z "$(kubectl get pods --selector k8s-app=kube-dns --namespace kube-system | grep -E "\s+Running\s+")" ]; do sleep 3; done'
+$SHELL -c 'while [ -z "$(kubectl get pods --selector k8s-app=kube-dns --namespace kube-system | grep -E "\s+Running\s+")" ]; do kubectl get nodes ; sleep 3; done'
 
 # install the kubernetes dashboard.
 # see https://kubernetes.io/docs/tasks/access-application-cluster/web-ui-dashboard/
-kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/master/aio/deploy/recommended/kubernetes-dashboard.yaml
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/master/aio/deploy/recommended/00_dashboard-namespace.yaml
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/master/aio/deploy/recommended/01_dashboard-serviceaccount.yaml
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/master/aio/deploy/recommended/02_dashboard-service.yaml
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/master/aio/deploy/recommended/03_dashboard-secret.yaml
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/master/aio/deploy/recommended/04_dashboard-configmap.yaml
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/master/aio/deploy/recommended/05_dashboard-rbac.yaml
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/master/aio/deploy/recommended/06_dashboard-deployment.yaml
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/master/aio/deploy/recommended/07_scraper-service.yaml
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/master/aio/deploy/recommended/08_scraper-deployment.yaml
 
 # create the admin user.
 # see https://github.com/kubernetes/dashboard/wiki/Creating-sample-user
