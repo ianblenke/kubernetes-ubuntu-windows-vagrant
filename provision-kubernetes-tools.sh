@@ -15,7 +15,7 @@ export DEBIAN_FRONTEND=noninteractive
 wget -qO- https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
 add-apt-repository "deb http://apt.kubernetes.io/ kubernetes-xenial main"
 apt-get update
-apt-get install -y kubelet kubeadm kubectl
+apt-get install -y kubelet=1.14.10-00 kubeadm=1.14.10-00 kubectl=1.14.10-00
 
 # make sure kublet uses:
 #   1. the same cgroup driver as docker.
