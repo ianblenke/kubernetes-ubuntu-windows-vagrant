@@ -80,16 +80,23 @@ Write-Title 'windows BuildLabEx version'
 # see https://channel9.msdn.com/Blogs/One-Dev-Minute/Decoding-Windows-Build-Numbers
 (Get-ItemProperty -Path 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion' -Name BuildLabEx).BuildLabEx
 
-Write-Title 'docker version'
-docker version
+#Write-Title 'docker version'
+#docker version
+#
+#$ErrorActionPreference = 'SilentlyContinue'
+#
+#Write-Title 'docker info'
+#try {
+#docker info
+#} catch {}
+#
+## see https://docs.docker.com/engine/api/v1.32/
+## see https://github.com/moby/moby/tree/master/api
+#Write-Title 'docker info (obtained from http://localhost:2375/info)'
+#try {
+#$infoResponse = Invoke-WebRequest 'http://localhost:2375/info' -UseBasicParsing
+#$info = $infoResponse.Content | ConvertFrom-Json
+#Write-Output "Engine Version:     $($info.ServerVersion)"
+#Write-Output "Engine Api Version: $($infoResponse.Headers['Api-Version'])"
+#} catch {}
 
-Write-Title 'docker info'
-docker info
-
-# see https://docs.docker.com/engine/api/v1.32/
-# see https://github.com/moby/moby/tree/master/api
-Write-Title 'docker info (obtained from http://localhost:2375/info)'
-$infoResponse = Invoke-WebRequest 'http://localhost:2375/info' -UseBasicParsing
-$info = $infoResponse.Content | ConvertFrom-Json
-Write-Output "Engine Version:     $($info.ServerVersion)"
-Write-Output "Engine Api Version: $($infoResponse.Headers['Api-Version'])"
