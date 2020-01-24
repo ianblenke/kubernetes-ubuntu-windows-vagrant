@@ -7,10 +7,10 @@ param(
 )
 
 # see https://github.com/kubernetes/kubernetes/blob/master/CHANGELOG-1.14.md#node-binaries
-$archiveVersion = '1.14.0'
+$archiveVersion = '1.14.10'
 $archiveName = 'kubernetes-node-windows-amd64.tar.gz'
 $archiveUrl = "https://dl.k8s.io/v$archiveVersion/$archiveName"
-$archiveHash = '120afdebe844b06a7437bb9788c3e7ea4fc6352aa18cc6a00e70f44f54664f844429f138870bc15862579da632632dff2e7323be7f627d9c33585a11ad2bed6b'
+$archiveHash = '3f8bfc75734c19cc52e6e46bb843cfb429cba61cd7bfa8eab8273d39aa7b13bde142ef1d9daffac092265cde368add1c10a21800992f645bce08eaf914910d45'
 $archivePath = "$env:TEMP\$archiveName"
 
 Write-Host "Downloading $archiveName..."
