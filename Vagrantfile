@@ -63,10 +63,10 @@ Vagrant.configure(2) do |config|
 
     config.vm.define name do |config|
       config.vm.provider 'libvirt' do |lv, config|
-        lv.memory = 2*1024
+        lv.memory = 8*1024
       end
       config.vm.provider 'virtualbox' do |vb|
-        vb.memory = 2*1024
+        vb.memory = 8*1024
       end
       config.vm.hostname = fqdn
       config.vm.network :private_network, ip: ip, libvirt__forward_mode: 'none', libvirt__dhcp_enabled: false
@@ -82,26 +82,27 @@ Vagrant.configure(2) do |config|
     ip = windows_worker_node_ip_addr.to_s; windows_worker_node_ip_addr = windows_worker_node_ip_addr.succ
 
     config.vm.define name do |config|
-      config.vm.box = 'StefanScherer/windows_2019_docker'
+      config.vm.box = 'StefanScherer/windows_2019'
       config.vm.provider 'libvirt' do |lv, config|
-        lv.memory = 2*1024
+        lv.memory = 4*1024
         # replace the default synced_folder with something that works in the base box.
         # NB for some reason, this does not work when placed in the base box Vagrantfile.
         config.vm.synced_folder ".", "/vagrant", type: "smb", smb_username: ENV["USER"], smb_password: ENV["VAGRANT_SMB_PASSWORD"]
       end
       config.vm.provider 'virtualbox' do |vb|
-        vb.memory = 2*1024
+        vb.memory = 4*1024
       end
+      config.winrm.username = 'vagrant\vagrant'
       config.vm.hostname = name
       config.vm.network :private_network, ip: ip, libvirt__forward_mode: 'none', libvirt__dhcp_enabled: false
-      config.vm.provision 'shell', path: 'windows/ps.ps1', args: 'provision-containers-feature.ps1'
-      config.vm.provision 'shell', inline: 'echo "Rebooting..."', reboot: true
-      config.vm.provision 'shell', path: 'windows/ps.ps1', args: 'provision-chocolatey.ps1'
-      config.vm.provision 'shell', path: 'windows/ps.ps1', args: 'provision-base.ps1'
-      config.vm.provision 'shell', path: 'windows/ps.ps1', args: 'provision-docker.ps1'
-      config.vm.provision 'shell', path: 'windows/ps.ps1', args: 'provision-docker-reg.ps1'
-      config.vm.provision 'shell', path: 'windows/provision-docker-prepare-network.ps1', reboot: true
-      config.vm.provision 'shell', path: 'windows/ps.ps1', args: ['provision-kubernetes-worker.ps1', ip, pod_network_cidr, service_cidr, service_dns_domain, kube_dns_service_ip]
+      config.vm.provision 'shell', path: 'windows/ps.ps1', args: 'provision-containers-feature.ps1', privileged: false
+      config.vm.provision 'shell', inline: 'echo "Rebooting..."', reboot: true, privileged: false
+      config.vm.provision 'shell', path: 'windows/ps.ps1', args: 'provision-chocolatey.ps1', privileged: false
+      config.vm.provision 'shell', path: 'windows/ps.ps1', args: 'provision-base.ps1', privileged: false
+      config.vm.provision 'shell', path: 'windows/ps.ps1', args: 'provision-docker.ps1', privileged: false
+      config.vm.provision 'shell', path: 'windows/ps.ps1', args: 'provision-docker-reg.ps1', privileged: false
+      config.vm.provision 'shell', path: 'windows/provision-docker-prepare-network.ps1', reboot: true, privileged: false
+      config.vm.provision 'shell', path: 'windows/ps.ps1', args: ['provision-kubernetes-worker.ps1', ip, pod_network_cidr, service_cidr, service_dns_domain, kube_dns_service_ip], privileged: false
     end
   end
 end
