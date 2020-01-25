@@ -4,11 +4,7 @@ This is a playground for a mixed kubernetes cluster of ubuntu and windows nodes 
 
 # Usage
 
-Install the [Ubuntu Base Box](https://github.com/rgl/ubuntu-vagrant).
-
-Install the [Windows 2019 Base Box](https://github.com/rgl/windows-2016-vagrant).
-
-Install `kublectl` in your machine, e.g. on Ubuntu:
+Install `kubectl` in your machine, e.g. on Ubuntu:
 
 ```bash
 wget -qO- https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
@@ -17,10 +13,22 @@ apt-get install -y kubectl
 kubectl version --client
 ```
 
+Or on a mac with [Homebrew](https://brew.sh)
+
+```bash
+brew install kubernetes-cli
+```
+
 Launch a kubernetes master (`km1`), a ubuntu worker (`kwu1`) and a windows worker (`kww1`):
 
 ```bash
 vagrant up km1 kwu1 kww1
+```
+
+These three VMs are the default. You can simply run:
+
+```bash
+vagrant up
 ```
 
 # Kubernetes proxy
@@ -132,6 +140,20 @@ Remove the application:
 kubectl delete deployment kubernetes-bootcamp
 kubectl delete service kubernetes-bootcamp
 kubectl get all
+```
+
+Destroy the Vagrant vms:
+
+```bash
+vagrant destroy kww1 kwu1 km1
+```
+
+This will prompt you to ask if it is ok to do so.
+
+Or destroy all of them without asking:
+
+```bash
+vagrant destroy -f
 ```
 
 # Reference
