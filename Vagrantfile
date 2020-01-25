@@ -113,6 +113,7 @@ Vagrant.configure(2) do |config|
       config.vm.provision 'shell', path: 'windows/ps.ps1', args: 'provision-docker-reg.ps1', privileged: false
       config.vm.provision 'shell', path: 'windows/provision-docker-prepare-network.ps1', reboot: true, privileged: false
       config.vm.provision 'shell', path: 'windows/ps.ps1', args: ['provision-kubernetes-worker.ps1', ip, pod_network_cidr, service_cidr, service_dns_domain, kube_dns_service_ip], privileged: false
+      config.vm.provision 'shell', inline: 'echo "Rebooting..."', reboot: true, privileged: false
     end
   end
 end
