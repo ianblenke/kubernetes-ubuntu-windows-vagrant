@@ -40,3 +40,6 @@ systemctl cat kubelet.service
 kubelet --version
 kubeadm version -o json
 kubectl version -o json 2>/dev/null || true
+
+# show the config
+kubectl config view || true
