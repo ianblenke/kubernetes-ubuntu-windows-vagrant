@@ -1,3 +1,8 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.require_version ">= 1.8.4"
+
 # to make sure the km1 node is created before the other nodes, we
 # have to force a --no-parallel execution.
 ENV['VAGRANT_NO_PARALLEL'] = 'yes'
@@ -30,6 +35,7 @@ Vagrant.configure(2) do |config|
   end
 
   config.vm.provider 'virtualbox' do |vb|
+    config.vagrant.plugins = [ "vagrant-disksize" ]
     vb.linked_clone = true
     vb.cpus = 4
   end
@@ -67,6 +73,8 @@ Vagrant.configure(2) do |config|
       end
       config.vm.provider 'virtualbox' do |vb|
         vb.memory = 8*1024
+        config.vagrant.plugins = [ "vagrant-disksize" ]
+        config.disksize.size = '100GB'
       end
       config.vm.hostname = fqdn
       config.vm.network :private_network, ip: ip, libvirt__forward_mode: 'none', libvirt__dhcp_enabled: false
@@ -91,6 +99,8 @@ Vagrant.configure(2) do |config|
       end
       config.vm.provider 'virtualbox' do |vb|
         vb.memory = 4*1024
+        config.vagrant.plugins = [ "vagrant-disksize" ]
+        config.disksize.size = '100GB'
       end
       config.winrm.username = 'vagrant\vagrant'
       config.vm.hostname = name
