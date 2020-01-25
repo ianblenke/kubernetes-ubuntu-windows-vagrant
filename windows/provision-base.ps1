@@ -1,3 +1,9 @@
+# Extend the disk partitioned volume to the full resized disk
+Set-Content -Value "select volume 1" -Path C:\diskpart.txt
+Add-Content -Value "extend" -Path C:\diskpart.txt
+diskpart /s C:\diskpart.txt
+del C:\diskpart.txt
+
 # set keyboard layout.
 # NB you can get the name from the list:
 #      [Globalization.CultureInfo]::GetCultures('InstalledWin32Cultures') | Out-GridView
