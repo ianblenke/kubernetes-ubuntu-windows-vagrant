@@ -43,12 +43,34 @@ Set-Content `
     )
 
 Write-Host 'Installing...'
-Write-Host 'TODO you need to manually run the following command to add the node to the cluster (YOU MUST ADD QUOTES to -InterfaceName):'
 Push-Location C:\k
+
+$taskName = "kubeletstartup"
+$KCommandPath = "C:\k\kubeletstartup.ps1"
+
+New-Item "$KCommandPath"
+Set-Content "$KCommandPath" 'cd \k'
+Add-Content "$KCommandPath" "powershell -File start.ps1 -NetworkMode overlay -InterfaceName \$((Get-NetIPAddress -IPAddress $nodeIp).InterfaceAlias) -ManagementIP $nodeIp -ClusterCIDR $podNetworkCidr -ServiceCIDR $serviceCidr -KubeDnsServiceIP $kubeDnsServiceIp"
+
+Write-Host "Registering the Scheduled Task $taskName to run $KCommandPath..."
+$action = New-ScheduledTaskAction `
+          -Execute 'PowerShell.exe' `
+          -Argument "-NoProfile -ExecutionPolicy Bypass $KCommandPath -RunningAsScheduledTask"
+$trigger = New-ScheduledTaskTrigger `
+           -AtStartup `
+           -RandomDelay 00:00:15
+Register-ScheduledTask `
+        -TaskName $taskName `
+        -Trigger $trigger `
+        -Action $action `
+        -User 'SYSTEM' `
+        | Out-Null
+
+Pop-Location
 Write-Host 'cd c:\k'
 Write-Host powershell -File start.ps1 `
     -NetworkMode overlay `
-    -InterfaceName (Get-NetIPAddress -IPAddress $nodeIp).InterfaceAlias `
+    -InterfaceName $((Get-NetIPAddress -IPAddress $nodeIp).InterfaceAlias) `
     -ManagementIP $nodeIp `
     -ClusterCIDR $podNetworkCidr `
     -ServiceCIDR $serviceCidr `
