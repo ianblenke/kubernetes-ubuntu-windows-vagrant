@@ -65,7 +65,6 @@ $arguments = '-ExecutionPolicy Bypass -NoProfile -File "{0}"' -f $scriptPath
 & $nssm install $serviceName $powershell $arguments
 & $nssm status $serviceName
 Set-Service $serviceName -StartupType Automatic
-Start-Service $serviceName
 Get-Service $serviceName
 
 #Write-Host "Registering the Scheduled Task $taskName to run $KCommandPath..."
