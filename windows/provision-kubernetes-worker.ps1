@@ -50,36 +50,53 @@ $KCommandPath = "C:\k\kubeletstartup.ps1"
 
 New-Item "$KCommandPath"
 Set-Content "$KCommandPath" 'cd \k'
-Add-Content "$KCommandPath" "powershell -File start.ps1 -NetworkMode overlay -InterfaceName \$((Get-NetIPAddress -IPAddress $nodeIp).InterfaceAlias) -ManagementIP $nodeIp -ClusterCIDR $podNetworkCidr -ServiceCIDR $serviceCidr -KubeDnsServiceIP $kubeDnsServiceIp"
+Add-Content "$KCommandPath" "powershell -File start.ps1 -NetworkMode overlay -InterfaceName '$((Get-NetIPAddress -IPAddress $nodeIp).InterfaceAlias)' -ManagementIP $nodeIp -ClusterCIDR $podNetworkCidr -ServiceCIDR $serviceCidr -KubeDnsServiceIP $kubeDnsServiceIp"
 
-Write-Host "Registering the Scheduled Task $taskName to run $KCommandPath..."
-$action = New-ScheduledTaskAction `
-          -Execute 'PowerShell.exe' `
-          -Argument "-NoProfile -ExecutionPolicy Bypass $KCommandPath -RunningAsScheduledTask"
-$trigger = New-ScheduledTaskTrigger `
-           -AtStartup `
-           -RandomDelay 00:00:15
-Register-ScheduledTask `
-        -TaskName $taskName `
-        -Trigger $trigger `
-        -Action $action `
-        -User 'SYSTEM' `
-        | Out-Null
+# Install nssm
+choco install -y nssm
+refreshenv
+
+# kubletstartup service - Spin up flannel and join the node to the cluster
+$nssm = (Get-Command nssm).Source
+$serviceName = 'kubeletstartup'
+$powershell = (Get-Command powershell).Source
+$scriptPath = 'C:/k/kubeletstartup.ps1'
+$arguments = '-ExecutionPolicy Bypass -NoProfile -File "{0}"' -f $scriptPath
+& $nssm install $serviceName $powershell $arguments
+& $nssm status $serviceName
+Set-Service $serviceName -StartupType Automatic
+Start-Service $serviceName
+Get-Service $serviceName
+
+#Write-Host "Registering the Scheduled Task $taskName to run $KCommandPath..."
+#$action = New-ScheduledTaskAction `
+#          -Execute 'PowerShell.exe' `
+#          -Argument "-NoProfile -ExecutionPolicy Bypass $KCommandPath -RunningAsScheduledTask"
+#$trigger = New-ScheduledTaskTrigger `
+#           -AtStartup `
+#           -RandomDelay 00:00:15
+#Register-ScheduledTask `
+#        -TaskName $taskName `
+#        -Trigger $trigger `
+#        -Action $action `
+#        -User 'SYSTEM' `
+#        | Out-Null
 
 Pop-Location
-Write-Host 'cd c:\k'
-Write-Host powershell -File start.ps1 `
-    -NetworkMode overlay `
-    -InterfaceName $((Get-NetIPAddress -IPAddress $nodeIp).InterfaceAlias) `
-    -ManagementIP $nodeIp `
-    -ClusterCIDR $podNetworkCidr `
-    -ServiceCIDR $serviceCidr `
-    -KubeDnsServiceIP $kubeDnsServiceIp
-Pop-Location
-Write-Host 'TODO then start an example daemon set with kubectl apply -f example-daemonset-hello.yml'
-Write-Host 'TODO to be able to see the container logs and shell from the dashboard you must disable the firewall or figure out what is needed to open for it to work'
-Write-Host 'TODO run as windows services'
 
-# $env:PATH += ";C:\k"
-# $joinCommand = (Get-Content -Raw C:/vagrant/tmp/kubeadm-join.sh).Trim()
-# PowerShell -Command $joinCommand
+#Write-Host 'cd c:\k'
+#Write-Host powershell -File start.ps1 `
+#    -NetworkMode overlay `
+#    -InterfaceName $((Get-NetIPAddress -IPAddress $nodeIp).InterfaceAlias) `
+#    -ManagementIP $nodeIp `
+#    -ClusterCIDR $podNetworkCidr `
+#    -ServiceCIDR $serviceCidr `
+#    -KubeDnsServiceIP $kubeDnsServiceIp
+#Pop-Location
+#Write-Host 'TODO then start an example daemon set with kubectl apply -f example-daemonset-hello.yml'
+#Write-Host 'TODO to be able to see the container logs and shell from the dashboard you must disable the firewall or figure out what is needed to open for it to work'
+#Write-Host 'TODO run as windows services'
+
+#$env:PATH += ";C:\k"
+#$joinCommand = (Get-Content -Raw C:/vagrant/tmp/kubeadm-join.sh).Trim()
+#PowerShell -Command $joinCommand
