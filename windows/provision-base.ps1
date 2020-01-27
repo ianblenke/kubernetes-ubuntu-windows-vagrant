@@ -71,6 +71,11 @@ $FileData = $FileData.Replace('AuthorizedKeysFile __PROGRAMDATA__/ssh/administra
 $FileData += "Subsystem	powershell C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -sshs -NoLogo -NoProfile"
 $FileData | Out-File $FilePath -Force
 
+# Grab the ssh key trust for vagrant
+Invoke-WebRequest 'https://raw.githubusercontent.com/hashicorp/vagrant/master/keys/vagrant.pub' -OutFile $env:ProgramData\ssh\administrators_authorized_keys
+mkdir C:\Users\vagrant\.ssh
+Invoke-WebRequest 'https://raw.githubusercontent.com/hashicorp/vagrant/master/keys/vagrant.pub' -OutFile C:\Users\vagrant\.ssh\authorized_keys
+
 # Fix the file permissions
 Import-Module "C:\Program Files\OpenSSH-Win64\OpenSSHUtils.psd1" -Force
 . "C:\Program Files\OpenSSH-Win64\FixHostFilePermissions.ps1" -Confirm:$false
