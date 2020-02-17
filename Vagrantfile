@@ -10,7 +10,7 @@ ENV['VAGRANT_NO_PARALLEL'] = 'yes'
 require 'ipaddr'
 
 number_of_master_nodes          = 1
-number_of_ubuntu_worker_nodes   = 1
+number_of_ubuntu_worker_nodes   = 3
 number_of_windows_worker_nodes  = 1
 first_master_node_ip            = '10.11.0.101'
 first_ubuntu_worker_node_ip     = '10.11.0.201'
@@ -46,6 +46,7 @@ Vagrant.configure(2) do |config|
     ip = master_node_ip_addr.to_s; master_node_ip_addr = master_node_ip_addr.succ
 
     config.vm.define name do |config|
+      config.vm.network "forwarded_port", guest: 6443, host: 6443-1+n, protocol: "tcp", auto_correct: true, id: "#{name}kubeapi"
       # NB 512M of memory is not enough to run a kubernetes master.
       config.vm.provider 'libvirt' do |lv, config|
         lv.memory = 1024
@@ -68,11 +69,14 @@ Vagrant.configure(2) do |config|
     ip = ubuntu_worker_node_ip_addr.to_s; ubuntu_worker_node_ip_addr = ubuntu_worker_node_ip_addr.succ
 
     config.vm.define name do |config|
+      config.vm.network "forwarded_port", guest: 80, host: 80-1+n, protocol: "tcp", auto_correct: true, id: "#{name}http"
+      config.vm.network "forwarded_port", guest: 443, host: 443-1+n, protocol: "tcp", auto_correct: true, id: "#{name}https"
+      config.vm.network "forwarded_port", guest: 1433, host: 1433-1+n, protocol: "tcp", auto_correct: true, id: "#{name}mssql"
       config.vm.provider 'libvirt' do |lv, config|
-        lv.memory = 8*1024
+        lv.memory = 12*1024
       end
       config.vm.provider 'virtualbox' do |vb|
-        vb.memory = 8*1024
+        vb.memory = 12*1024
         config.vagrant.plugins = [ "vagrant-disksize" ]
         config.disksize.size = '100GB'
       end
@@ -109,6 +113,7 @@ Vagrant.configure(2) do |config|
       config.vm.provision 'shell', inline: 'echo "Rebooting..."', reboot: true, privileged: false
       config.vm.provision 'shell', path: 'windows/ps.ps1', args: 'provision-chocolatey.ps1', privileged: false
       config.vm.provision 'shell', path: 'windows/ps.ps1', args: 'provision-base.ps1', privileged: false
+      #config.vm.provision 'shell', path: 'windows/ps.ps1', args: 'provision-ssh.ps1', privileged: false
       config.vm.provision 'shell', path: 'windows/ps.ps1', args: 'provision-docker.ps1', privileged: false
       config.vm.provision 'shell', path: 'windows/ps.ps1', args: 'provision-docker-reg.ps1', privileged: false
       config.vm.provision 'shell', path: 'windows/provision-docker-prepare-network.ps1', reboot: true, privileged: false
