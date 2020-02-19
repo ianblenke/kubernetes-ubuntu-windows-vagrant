@@ -108,7 +108,7 @@ metadata:
 data:
   cni-conf.json: |
     {
-      "name": "vxlan0",
+      "name": "cni0",
       "cniVersion": "0.3.1",
       "plugins": [
         {
@@ -194,6 +194,7 @@ spec:
         args:
         - --ip-masq
         - --kube-subnet-mgr
+        - --iface=enp0s8
         resources:
           requests:
             cpu: "100m"
